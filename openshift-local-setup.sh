@@ -100,6 +100,8 @@ export PATH="$(pwd)/_output/local/go/bin/:$PATH"
 alias oc="oc --config=$(pwd)/openshift.local.config/master/admin.kubeconfig" ;
 alias oadm="oadm --config=$(pwd)/openshift.local.config/master/admin.kubeconfig"
 sudo chmod +r openshift.local.config/master/admin.kubeconfig
+# To login by other users as well
+sudo chmod o+w openshift.local.config/master/admin.kubeconfig
 
 # imagestream
 #---------------------------------#
