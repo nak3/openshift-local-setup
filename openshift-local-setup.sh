@@ -40,12 +40,6 @@ echo "
 Step 1 : Prepare
 "
 #---------------------------------#
-if netstat -an |grep -E ":80|:443|:4001|:7001|:8443" |grep LISTEN > /dev/null
-then
-  echo "Port(80,443,4001,7001 or 8443) is used by other process. Please stop it."
-  exit 1
-fi
-
 if pgrep openshift > /dev/null
 then
   echo "\"openshift\" process is already running. Please stop it"
@@ -56,6 +50,12 @@ if pgrep docker > /dev/null
 then
   echo "\"docker\" process is already running. Please stop it"
   exit 1;
+fi
+
+if netstat -an |grep -E ":80|:443|:4001|:7001|:8443" |grep LISTEN > /dev/null
+then
+  echo "Port(80,443,4001,7001 or 8443) is used by other process. Please stop it."
+  exit 1
 fi
 
 # build
@@ -118,7 +118,7 @@ echo "
 Step 5 : Import CentOS imageStream
 "
 #---------------------------------#
-if oc get is -n openshift | grep openshift > /dev/null
+if $OC get is -n openshift | grep openshift > /dev/null
 then
   echo "ImageStream has already imported. Skipped"
 else
@@ -142,7 +142,7 @@ fi
 # router
 #---------------------------------#
 echo "
-Step 7 : Deployed router
+Step 7 : Deploy router
 "
 #---------------------------------#
 if $OC get pod | grep docker-router-1 > /dev/null
