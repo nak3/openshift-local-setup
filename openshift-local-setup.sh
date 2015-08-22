@@ -83,10 +83,10 @@ echo "
 Step 3 : Start docker and openshift standalone
 "
 #---------------------------------#
-sudo docker -d --insecure-registry 172.30.0.0/16 > ${DOCKER_LOG} 2>&1 &
+sudo -E docker -d --insecure-registry 172.30.0.0/16 > ${DOCKER_LOG} 2>&1 &
 DOCKER_PID=$!
 
-sudo _output/local/go/bin/openshift start --loglevel=4 --hostname=${ORIGIN_HOST} --volume-dir=${VOLUME_DIR} --etcd-dir=${ETCD_DIR} > ${ORIGIN_LOG} 2>&1 &
+sudo -E _output/local/go/bin/openshift start --loglevel=4 --hostname=${ORIGIN_HOST} --volume-dir=${VOLUME_DIR} --etcd-dir=${ETCD_DIR} > ${ORIGIN_LOG} 2>&1 &
 ORIGIN_PID=$!
 
 echo "Wait 10 sec until start the process completely..."
@@ -105,9 +105,9 @@ echo "
 Step 4 : Setup
 "
 #---------------------------------#
-export PATH="$(pwd)/_output/local/go/bin/:$PATH"
-alias oc="oc --config=$(pwd)/openshift.local.config/master/admin.kubeconfig" ;
-alias oadm="oadm --config=$(pwd)/openshift.local.config/master/admin.kubeconfig"
+#NOTE: Some environment can't validate alias command in script.
+OC="$(pwd)/_output/local/go/bin/oc --config=$(pwd)/openshift.local.config/master/admin.kubeconfig"
+OADM="$(pwd)/_output/local/go/bin/oadm --config=$(pwd)/openshift.local.config/master/admin.kubeconfig"
 sudo chmod +r openshift.local.config/master/admin.kubeconfig
 # To login by other users as well
 sudo chmod o+w openshift.local.config/master/admin.kubeconfig
@@ -122,7 +122,7 @@ if oc get is -n openshift | grep openshift > /dev/null
 then
   echo "ImageStream has already imported. Skipped"
 else
-  oc create -f examples/image-streams/image-streams-centos7.json -n openshift
+  $OC create -f examples/image-streams/image-streams-centos7.json -n openshift
 fi
 
 # registry
@@ -131,12 +131,12 @@ echo "
 Step 6 : Deploy docker registry
 "
 #---------------------------------#
-if oc get pod | grep docker-registry-1 > /dev/null
+if $OC get pod | grep docker-registry-1 > /dev/null
 then
   echo "Registry has already deployed. Skipped"
 else
   sudo chmod +r openshift.local.config/master/openshift-registry.kubeconfig
-  oadm registry --create --credentials=openshift.local.config/master/openshift-registry.kubeconfig --config=openshift.local.config/master/admin.kubeconfig
+  $OADM registry --create --credentials=openshift.local.config/master/openshift-registry.kubeconfig
 fi
 
 # router
@@ -145,17 +145,17 @@ echo "
 Step 7 : Deployed router
 "
 #---------------------------------#
-if oc get pod | grep docker-router-1 > /dev/null
+if $OC get pod | grep docker-router-1 > /dev/null
 then
   echo "Router has already deployed. Skipped"
 else
-  echo '{"kind":"ServiceAccount","apiVersion":"v1","metadata":{"name":"router"}}' | oc create -f -
-  oc get scc -t "{{range .items}}{{.metadata.name}}: n={{.allowHostNetwork}},p={{.allowHostPorts}}; {{end}}"
+  echo '{"kind":"ServiceAccount","apiVersion":"v1","metadata":{"name":"router"}}' | $OC create -f -
+  $OC get scc -t "{{range .items}}{{.metadata.name}}: n={{.allowHostNetwork}},p={{.allowHostPorts}}; {{end}}"
   sudo chmod a+r openshift.local.config/master/openshift-router.kubeconfig
-  oc get scc privileged -o yaml > /tmp/scc-priviledged.yaml
+  $OC get scc privileged -o yaml > /tmp/scc-priviledged.yaml
   echo "- system:serviceaccount:default:router" >> /tmp/scc-priviledged.yaml
-  oc update scc privileged -f /tmp/scc-priviledged.yaml
-  oadm router --credentials="openshift.local.config/master/openshift-router.kubeconfig" --service-account=router
+  $OC update scc privileged -f /tmp/scc-priviledged.yaml
+  $OADM router --credentials="openshift.local.config/master/openshift-router.kubeconfig" --service-account=router
 fi
 
 # finish
