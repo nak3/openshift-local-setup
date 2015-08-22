@@ -5,6 +5,8 @@ ORIGINPATH=$(pwd)
 DOCKER_LOG=/tmp/docker.log
 ORIGIN_LOG=/tmp/origin.log
 ORIGIN_HOST=127.0.0.1
+ETCD_DIR=`mktemp -d /tmp/etcd-XXX`
+VOLUME_DIR=`mktemp -d /tmp/volumes-XXX`
 #ORIGIN_URL=https://github.com/openshift/origin.git
 #ORIGIN_BRANCH=master
 #------------
@@ -84,11 +86,18 @@ Step 3 : Start docker and openshift standalone
 sudo docker -d --insecure-registry 172.30.0.0/16 > ${DOCKER_LOG} 2>&1 &
 DOCKER_PID=$!
 
-sudo _output/local/go/bin/openshift start --loglevel=4 --hostname=${ORIGIN_HOST} > ${ORIGIN_LOG} 2>&1 &
+sudo _output/local/go/bin/openshift start --loglevel=4 --hostname=${ORIGIN_HOST} --volume-dir=${VOLUME_DIR} --etcd-dir=${ETCD_DIR} > ${ORIGIN_LOG} 2>&1 &
 ORIGIN_PID=$!
 
 echo "Wait 10 sec until start the process completely..."
 sleep 10
+
+if ! pgrep -P ${DOCKER_PID} > /dev/null ; then
+  echo "Failed to start docker. Please check $DOCKER_LOG" ; exit 1
+fi
+if ! pgrep -P ${ORIGIN_PID} > /dev/null ; then
+  echo "Failed to start openshift. Please check $ORIGIN_LOG" ; exit 1
+fi
 
 # setup
 #---------------------------------#
