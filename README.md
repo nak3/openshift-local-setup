@@ -65,6 +65,14 @@ router-1-ocp74                 1/1       Running      0          1h
 
 ##### 7. Now you can use your OpenShift!
 
+Login and create project.
+
+~~~
+oadm policy add-role-to-user admin joe
+oc login -u joe -p foo
+oc new-project demoproject
+~~~
+
 Contact
 ----------
 
