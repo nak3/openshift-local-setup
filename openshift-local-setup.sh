@@ -89,6 +89,9 @@ DOCKER_PID=$!
 sudo -E _output/local/go/bin/openshift start --loglevel=4 --hostname=${ORIGIN_HOST} --volume-dir=${VOLUME_DIR} --etcd-dir=${ETCD_DIR} > ${ORIGIN_LOG} 2>&1 &
 ORIGIN_PID=$!
 
+# *NOTE* 
+# Need to wait for start docker process "completely" and creating admin.kubeconfig. 
+# It is better to wait 10 sec rather than checking them
 echo "Wait 10 sec until start the process completely..."
 sleep 10
 
