@@ -81,6 +81,22 @@ curl `oc get svc |grep helloworld-v3 |awk '{print $2":"$4}' | sed -e 's/\/.*//'`
 Hello world
 ~~~
 
+##### 9. Test with domain name
+
+~~~
+oc expose svc helloworld-v3 --hostname=helloworld-v3.example.com
+su
+echo "<YOUR_HOST_IP>   helloworld-v3.example.com" >> /etc/hosts
+curl helloworld-v3.example.com
+Hello world
+~~~
+
+##### 10. Delete the application
+
+~~~
+oc delete all -l app=hello
+~~~
+
 Contact
 ----------
 
