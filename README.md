@@ -25,6 +25,12 @@ Quick start
 80 443 4001 7001 8443
 ~~~
 
+and stop firewalld
+
+~~~
+systemctl stop firewalld
+~~~
+
 ##### 2. Clone origin repository.
 
 ~~~
