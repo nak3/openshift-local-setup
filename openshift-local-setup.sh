@@ -52,7 +52,7 @@ then
   exit 1;
 fi
 
-if netstat -an |grep -E ":80|:443|:4001|:7001|:8443" |grep LISTEN > /dev/null
+if netstat -an |grep -E ":80 |:443 |:4001 |:7001 |:8443 " |grep LISTEN > /dev/null
 then
   echo "Port(80,443,4001,7001 or 8443) is used by other process. Please stop it."
   exit 1
