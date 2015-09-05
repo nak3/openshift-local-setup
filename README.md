@@ -13,6 +13,7 @@ Tested environment
 - Fedora 21 or later
 - RHEL 7.1
 - CentOS 7.1 (docker-1.7.1-108.el7.centos.x86_64/go1.4.2)
+- Ubuntu 14.04 (docker 1.8.1/go1.4)
 
 **NOTE** It depends on origin's version. At the moment(Origin v1.0.4 / OSE v3.0.1.0), it needs golang(>1.4), docker(>1.6) and git.
 
