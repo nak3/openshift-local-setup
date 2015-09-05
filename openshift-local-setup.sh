@@ -90,10 +90,12 @@ sudo -E _output/local/go/bin/openshift start --loglevel=4 --hostname=${ORIGIN_HO
 ORIGIN_PID=$!
 
 # *NOTE* 
-# Need to wait for start docker process "completely" and creating admin.kubeconfig. 
-# It is better to wait 10 sec rather than checking them
-echo "Wait 10 sec until start the process completely..."
-sleep 10
+# Need to wait until namespace "openshift" create
+while ! $(pwd)/_output/local/go/bin/oc --config=$(pwd)/openshift.local.config/master/admin.kubeconfig get namespace openshift > /dev/null 2>&1
+do
+  echo "Wait until openshift process start..."
+  sleep 1
+done
 
 if ! pgrep -P ${DOCKER_PID} > /dev/null ; then
   echo "Failed to start docker. Please check $DOCKER_LOG" ; exit 1
