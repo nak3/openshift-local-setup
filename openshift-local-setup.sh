@@ -86,7 +86,7 @@ Step 3 : Start docker and openshift standalone
 sudo -E docker -d --insecure-registry 172.30.0.0/16 > ${DOCKER_LOG} 2>&1 &
 DOCKER_PID=$!
 
-sudo -E _output/local/go/bin/openshift start --loglevel=4 --hostname=${ORIGIN_HOST} --volume-dir=${VOLUME_DIR} --etcd-dir=${ETCD_DIR} > ${ORIGIN_LOG} 2>&1 &
+sudo -E _output/local/go/bin/openshift start --latest-images=true --loglevel=5 --hostname=${ORIGIN_HOST} --volume-dir=${VOLUME_DIR} --etcd-dir=${ETCD_DIR} > ${ORIGIN_LOG} 2>&1 &
 ORIGIN_PID=$!
 
 # *NOTE* 
@@ -115,7 +115,7 @@ OC="$(pwd)/_output/local/go/bin/oc --config=$(pwd)/openshift.local.config/master
 OADM="$(pwd)/_output/local/go/bin/oadm --config=$(pwd)/openshift.local.config/master/admin.kubeconfig"
 sudo chmod +r openshift.local.config/master/admin.kubeconfig
 # To login by other users as well
-sudo chmod o+w openshift.local.config/master/admin.kubeconfig
+su--latest-images=true do chmod o+w openshift.local.config/master/admin.kubeconfig
 
 # imagestream
 #---------------------------------#
@@ -141,7 +141,7 @@ then
   echo "Registry has already deployed. Skipped"
 else
   sudo chmod +r openshift.local.config/master/openshift-registry.kubeconfig
-  $OADM registry --create --credentials=openshift.local.config/master/openshift-registry.kubeconfig
+  $OADM registry --latest-images=true --create --credentials=openshift.local.config/master/openshift-registry.kubeconfig
 fi
 
 # router
@@ -160,7 +160,7 @@ else
   $OC get scc privileged -o yaml > /tmp/scc-priviledged.yaml
   echo "- system:serviceaccount:default:router" >> /tmp/scc-priviledged.yaml
   $OC update scc privileged -f /tmp/scc-priviledged.yaml
-  $OADM router --credentials="openshift.local.config/master/openshift-router.kubeconfig" --service-account=router
+  $OADM router --latest-images=true --credentials="openshift.local.config/master/openshift-router.kubeconfig" --service-account=router
 fi
 
 # finish
@@ -177,6 +177,7 @@ Next steps: Open new terminal and setup it.
 export PATH=\"$ORIGINPATH/origin/_output/local/go/bin/:$PATH\"
 alias oc=\"oc --config=$ORIGINPATH/origin/openshift.local.config/master/admin.kubeconfig\" 
 alias oadm=\"oadm --config=$ORIGINPATH/origin/openshift.local.config/master/admin.kubeconfig\"
+alias openshift=\"openshift --config=$ORIGINPATH/origin/openshift.local.config/master/admin.kubeconfig\"
 source $ORIGINPATH/origin/rel-eng/completions/bash/oc
 "
 
