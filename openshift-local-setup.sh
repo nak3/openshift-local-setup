@@ -114,6 +114,8 @@ Step 4 : Setup
 OC="$(pwd)/_output/local/go/bin/oc --config=$(pwd)/openshift.local.config/master/admin.kubeconfig"
 OADM="$(pwd)/_output/local/go/bin/oadm --config=$(pwd)/openshift.local.config/master/admin.kubeconfig"
 sudo chmod +r openshift.local.config/master/admin.kubeconfig
+# This is for using new project by general users
+sudo chmod o+w openshift.local.config/master/admin.kubeconfig
 # To login by other users as well
 su--latest-images=true do chmod o+w openshift.local.config/master/admin.kubeconfig
 
