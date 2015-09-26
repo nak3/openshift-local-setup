@@ -23,6 +23,49 @@ cleanup()
 
 trap cleanup EXIT
 
+# inspired by kubernetes's hack/local-up-cluster.sh
+function detect_binary {
+    # Detect the OS name/arch so that we can find our binary
+    case "$(uname -s)" in
+      Darwin)
+        host_os=darwin
+        ;;
+      Linux)
+        host_os=linux
+        ;;
+      *)
+        echo "Unsupported host OS.  Must be Linux or Mac OS X." >&2
+        exit 1
+        ;;
+    esac
+
+    case "$(uname -m)" in
+      x86_64*)
+        host_arch=amd64
+        ;;
+      i?86_64*)
+        host_arch=amd64
+        ;;
+      amd64*)
+        host_arch=amd64
+        ;;
+      arm*)
+        host_arch=arm
+        ;;
+      i?86*)
+        host_arch=x86
+        ;;
+      *)
+        echo "Unsupported host arch. Must be x86_64, 386 or arm." >&2
+        exit 1
+        ;;
+    esac
+
+   OUT_PATH="${ORIGINPATH}/origin/_output/local/bin/${host_os}/${host_arch}"
+}
+
+detect_binary
+
 echo "
 --------------------------------
 Prepare:
@@ -86,12 +129,12 @@ Step 3 : Start docker and openshift standalone
 sudo -E docker -d --insecure-registry 172.30.0.0/16 > ${DOCKER_LOG} 2>&1 &
 DOCKER_PID=$!
 
-sudo -E _output/local/go/bin/openshift start --latest-images=true --loglevel=5 --hostname=${ORIGIN_HOST} --volume-dir=${VOLUME_DIR} --etcd-dir=${ETCD_DIR} > ${ORIGIN_LOG} 2>&1 &
+sudo -E ${OUT_PATH}/openshift start --latest-images=true --loglevel=5 --hostname=${ORIGIN_HOST} --volume-dir=${VOLUME_DIR} --etcd-dir=${ETCD_DIR} > ${ORIGIN_LOG} 2>&1 &
 ORIGIN_PID=$!
 
 # *NOTE* 
 # Need to wait until namespace "openshift" create
-while ! $(pwd)/_output/local/go/bin/oc --config=$(pwd)/openshift.local.config/master/admin.kubeconfig get namespace openshift > /dev/null 2>&1
+while ! ${OUT_PATH}/oc --config=$(pwd)/openshift.local.config/master/admin.kubeconfig get namespace openshift > /dev/null 2>&1
 do
   echo "Wait until openshift process start..."
   sleep 1
@@ -111,8 +154,8 @@ Step 4 : Setup
 "
 #---------------------------------#
 #NOTE: Some environment can't validate alias command in script.
-OC="$(pwd)/_output/local/go/bin/oc --config=$(pwd)/openshift.local.config/master/admin.kubeconfig"
-OADM="$(pwd)/_output/local/go/bin/oadm --config=$(pwd)/openshift.local.config/master/admin.kubeconfig"
+OC="${OUT_PATH}/oc --config=$(pwd)/openshift.local.config/master/admin.kubeconfig"
+OADM="${OUT_PATH}/oadm --config=$(pwd)/openshift.local.config/master/admin.kubeconfig"
 sudo chmod +r openshift.local.config/master/admin.kubeconfig
 # This is for using new project by general users
 sudo chmod o+w openshift.local.config/master/admin.kubeconfig
@@ -176,7 +219,7 @@ Logs:
 
 Next steps: Open new terminal and setup it.
 
-export PATH=\"$ORIGINPATH/origin/_output/local/go/bin/:$PATH\"
+export PATH=\"${OUT_PATH}/:$PATH\"
 alias oc=\"oc --config=$ORIGINPATH/origin/openshift.local.config/master/admin.kubeconfig\" 
 alias oadm=\"oadm --config=$ORIGINPATH/origin/openshift.local.config/master/admin.kubeconfig\"
 alias openshift=\"openshift --config=$ORIGINPATH/origin/openshift.local.config/master/admin.kubeconfig\"
