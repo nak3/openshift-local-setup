@@ -220,9 +220,9 @@ Logs:
 Next steps: Open new terminal and setup it.
 
 export PATH=\"${OUT_PATH}/:$PATH\"
-alias oc=\"oc --config=$ORIGINPATH/origin/openshift.local.config/master/admin.kubeconfig\" 
-alias oadm=\"oadm --config=$ORIGINPATH/origin/openshift.local.config/master/admin.kubeconfig\"
-alias openshift=\"openshift --config=$ORIGINPATH/origin/openshift.local.config/master/admin.kubeconfig\"
+export KUBECONFIG=\"$ORIGINPATH/origin/openshift.local.config/master/admin.kubeconfig\" 
+export KUBECONFIG=\"$ORIGINPATH/origin/openshift.local.config/master/admin.kubeconfig\"
+export KUBECONFIG=\"$ORIGINPATH/origin/openshift.local.config/master/admin.kubeconfig\"
 source $ORIGINPATH/origin/rel-eng/completions/bash/oc
 "
 
