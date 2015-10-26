@@ -223,7 +223,7 @@ export PATH=\"${OUT_PATH}/:$PATH\"
 export KUBECONFIG=\"$ORIGINPATH/origin/openshift.local.config/master/admin.kubeconfig\" 
 export KUBECONFIG=\"$ORIGINPATH/origin/openshift.local.config/master/admin.kubeconfig\"
 export KUBECONFIG=\"$ORIGINPATH/origin/openshift.local.config/master/admin.kubeconfig\"
-source $ORIGINPATH/origin/rel-eng/completions/bash/oc
+source $ORIGINPATH/origin/contrib/completions/bash/oc
 "
 
 while true; do sleep 1; done
