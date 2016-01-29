@@ -224,6 +224,8 @@ export KUBECONFIG=\"$ORIGINPATH/origin/openshift.local.config/master/admin.kubec
 export KUBECONFIG=\"$ORIGINPATH/origin/openshift.local.config/master/admin.kubeconfig\"
 export KUBECONFIG=\"$ORIGINPATH/origin/openshift.local.config/master/admin.kubeconfig\"
 source $ORIGINPATH/origin/contrib/completions/bash/oc
+source $ORIGINPATH/origin/contrib/completions/bash/oadm
+source $ORIGINPATH/origin/contrib/completions/bash/openshift
 "
 
 while true; do sleep 1; done
