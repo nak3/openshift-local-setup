@@ -73,7 +73,7 @@ Prepare:
 
 Requirement:
 - Install packages : golang(>1.4) docker(>1.6) git
-- Open ports       : 80 443 4001 7001 8443
+- Open ports       : 53 80 443 4001 7001 8443
 --------------------------------
 "
 
@@ -95,9 +95,9 @@ then
   exit 1;
 fi
 
-if netstat -an |grep -E ":80 |:443 |:4001 |:7001 |:8443 " |grep LISTEN > /dev/null
+if netstat -an |grep -E ":53 |:80 |:443 |:4001 |:7001 |:8443 " |grep LISTEN > /dev/null
 then
-  echo "Port(80,443,4001,7001 or 8443) is used by other process. Please stop it."
+  echo "Port(53,80,443,4001,7001 or 8443) is used by other process. Please stop it."
   exit 1
 fi
 
