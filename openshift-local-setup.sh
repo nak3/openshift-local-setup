@@ -116,8 +116,8 @@ if [ ! -e $ORIGINPATH/origin ]; then
   exit 1
 fi
 cd $ORIGINPATH/origin
-make build
-bash ./hack/update-generated-completions.sh
+OS_OUTPUT_GOPATH=1 make build
+OS_OUTPUT_GOPATH=1 bash ./hack/update-generated-completions.sh
 set +e
 
 # start
