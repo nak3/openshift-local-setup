@@ -159,8 +159,6 @@ OADM="${OUT_PATH}/oadm --config=$(pwd)/openshift.local.config/master/admin.kubec
 sudo chmod +r openshift.local.config/master/admin.kubeconfig
 # This is for using new project by general users
 sudo chmod o+w openshift.local.config/master/admin.kubeconfig
-# To login by other users as well
-su--latest-images=true do chmod o+w openshift.local.config/master/admin.kubeconfig
 
 # imagestream
 #---------------------------------#
@@ -185,8 +183,7 @@ if $OC get pod | grep docker-registry-1 > /dev/null
 then
   echo "Registry has already deployed. Skipped"
 else
-  sudo chmod +r openshift.local.config/master/openshift-registry.kubeconfig
-  $OADM registry --latest-images=true --create --credentials=openshift.local.config/master/openshift-registry.kubeconfig
+  $OADM registry --latest-images=true --create --service-account=registry
 fi
 
 # router
@@ -199,13 +196,8 @@ if $OC get pod | grep docker-router-1 > /dev/null
 then
   echo "Router has already deployed. Skipped"
 else
-  echo '{"kind":"ServiceAccount","apiVersion":"v1","metadata":{"name":"router"}}' | $OC create -f -
-  $OC get scc -t "{{range .items}}{{.metadata.name}}: n={{.allowHostNetwork}},p={{.allowHostPorts}}; {{end}}"
-  sudo chmod a+r openshift.local.config/master/openshift-router.kubeconfig
-  $OC get scc privileged -o yaml > /tmp/scc-priviledged.yaml
-  echo "- system:serviceaccount:default:router" >> /tmp/scc-priviledged.yaml
-  $OC update scc privileged -f /tmp/scc-priviledged.yaml
-  $OADM router --latest-images=true --credentials="openshift.local.config/master/openshift-router.kubeconfig" --service-account=router
+  $OADM policy add-scc-to-user hostnetwork -z router
+  $OADM router --latest-images=true --service-account=router
 fi
 
 # finish
