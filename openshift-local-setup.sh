@@ -129,7 +129,7 @@ Step 3 : Start docker and openshift standalone
 sudo -E docker -d --insecure-registry 172.30.0.0/16 > ${DOCKER_LOG} 2>&1 &
 DOCKER_PID=$!
 
-sudo -E ${OUT_PATH}/openshift start --latest-images=true --loglevel=5 --hostname=${ORIGIN_HOST} --volume-dir=${VOLUME_DIR} --etcd-dir=${ETCD_DIR} > ${ORIGIN_LOG} 2>&1 &
+sudo -E ${OUT_PATH}/openshift start --loglevel=5 --hostname=${ORIGIN_HOST} --volume-dir=${VOLUME_DIR} --etcd-dir=${ETCD_DIR} > ${ORIGIN_LOG} 2>&1 &
 ORIGIN_PID=$!
 
 # *NOTE* 
@@ -183,7 +183,7 @@ if $OC get pod | grep docker-registry-1 > /dev/null
 then
   echo "Registry has already deployed. Skipped"
 else
-  $OADM registry --latest-images=true --create --service-account=registry
+  $OADM registry --create --service-account=registry
 fi
 
 # router
