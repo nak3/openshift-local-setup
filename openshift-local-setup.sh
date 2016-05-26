@@ -132,6 +132,12 @@ DOCKER_PID=$!
 sudo -E ${OUT_PATH}/openshift start --loglevel=5 --hostname=${ORIGIN_HOST} --volume-dir=${VOLUME_DIR} --etcd-dir=${ETCD_DIR} > ${ORIGIN_LOG} 2>&1 &
 ORIGIN_PID=$!
 
+while ! ls /var/run/docker.sock > /dev/null 2>&1
+do
+  echo "Wait until docker process start..."
+  sleep 1
+done
+
 # *NOTE* 
 # Need to wait until namespace "openshift" create
 while ! ${OUT_PATH}/oc --config=$(pwd)/openshift.local.config/master/admin.kubeconfig get namespace openshift > /dev/null 2>&1
