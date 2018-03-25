@@ -3,7 +3,6 @@
 #------------
 ORIGINPATH=$(pwd)
 ORIGIN_LOG=/tmp/origin.log
-ORIGIN_HOST=127.0.0.1
 ETCD_DIR=`mktemp -d /tmp/etcd-XXX`
 VOLUME_DIR=`mktemp -d /tmp/volumes-XXX`
 #ORIGIN_URL=https://github.com/openshift/origin.git
@@ -123,7 +122,7 @@ do
   sleep 1
 done
 
-sudo -E ${OUT_PATH}/openshift start --loglevel=5 --hostname=${ORIGIN_HOST} --volume-dir=${VOLUME_DIR} --etcd-dir=${ETCD_DIR} > ${ORIGIN_LOG} 2>&1 &
+sudo -E ${OUT_PATH}/openshift start --loglevel=5 --volume-dir=${VOLUME_DIR} --etcd-dir=${ETCD_DIR} > ${ORIGIN_LOG} 2>&1 &
 ORIGIN_PID=$!
 
 
