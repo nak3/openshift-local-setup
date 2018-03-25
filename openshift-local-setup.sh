@@ -146,7 +146,6 @@ Step 4 : Setup
 #---------------------------------#
 #NOTE: Some environment can't validate alias command in script.
 OC="${OUT_PATH}/oc --config=$(pwd)/openshift.local.config/master/admin.kubeconfig"
-OADM="${OUT_PATH}/oadm --config=$(pwd)/openshift.local.config/master/admin.kubeconfig"
 sudo chmod +r openshift.local.config/master/admin.kubeconfig
 # This is for using new project by general users
 sudo chmod o+w openshift.local.config/master/admin.kubeconfig
@@ -174,7 +173,7 @@ if $OC get pod | grep docker-registry-1 > /dev/null
 then
   echo "Registry has already deployed. Skipped"
 else
-  $OADM registry --create --service-account=registry
+  $OC adm registry
 fi
 
 # router
@@ -187,8 +186,8 @@ if $OC get pod | grep docker-router-1 > /dev/null
 then
   echo "Router has already deployed. Skipped"
 else
-  $OADM policy add-scc-to-user hostnetwork -z router
-  $OADM router --latest-images=true --service-account=router
+  $OC adm policy add-scc-to-user hostnetwork -z router
+  $OC adm router
 fi
 
 # finish
