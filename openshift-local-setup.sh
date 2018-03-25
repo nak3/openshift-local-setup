@@ -2,7 +2,6 @@
 
 #------------
 ORIGINPATH=$(pwd)
-DOCKER_LOG=/tmp/docker.log
 ORIGIN_LOG=/tmp/origin.log
 ORIGIN_HOST=127.0.0.1
 ETCD_DIR=`mktemp -d /tmp/etcd-XXX`
@@ -14,8 +13,6 @@ VOLUME_DIR=`mktemp -d /tmp/volumes-XXX`
 cleanup()
 {
   echo "Cleaning up."
-  [[ -n "${DOCKER_PID-}" ]] && DOCKER_PIDS=$(pgrep -P ${DOCKER_PID} ; ps -o pid= -p ${DOCKER_PID})
-  [[ -n "${DOCKER_PIDS-}" ]] && sudo kill ${DOCKER_PIDS}
 
   [[ -n "${ORIGIN_PID-}" ]] && ORIGIN_PIDS=$(pgrep -P ${ORIGIN_PID} ; ps -o pid= -p ${ORIGIN_PID})
   [[ -n "${ORIGIN_PIDS-}" ]] && sudo kill ${ORIGIN_PIDS}
@@ -89,12 +86,6 @@ then
   exit 1;
 fi
 
-if pgrep docker > /dev/null
-then
-  echo "\"docker\" process is already running. Please stop it"
-  exit 1;
-fi
-
 if netstat -an |grep -E ":53 |:80 |:443 |:4001 |:7001 |:8443 " |grep LISTEN > /dev/null
 then
   echo "Port(53,80,443,4001,7001 or 8443) is used by other process. Please stop it."
@@ -123,20 +114,18 @@ set +e
 # start
 #---------------------------------#
 echo "
-Step 3 : Start docker and openshift standalone
+Step 3 : Start openshift standalone
 "
 #---------------------------------#
-sudo -E docker -d --insecure-registry 172.30.0.0/16 > ${DOCKER_LOG} 2>&1 &
-DOCKER_PID=$!
-
-sudo -E ${OUT_PATH}/openshift start --loglevel=5 --hostname=${ORIGIN_HOST} --volume-dir=${VOLUME_DIR} --etcd-dir=${ETCD_DIR} > ${ORIGIN_LOG} 2>&1 &
-ORIGIN_PID=$!
-
 while ! ls /var/run/docker.sock > /dev/null 2>&1
 do
   echo "Wait until docker process start..."
   sleep 1
 done
+
+sudo -E ${OUT_PATH}/openshift start --loglevel=5 --hostname=${ORIGIN_HOST} --volume-dir=${VOLUME_DIR} --etcd-dir=${ETCD_DIR} > ${ORIGIN_LOG} 2>&1 &
+ORIGIN_PID=$!
+
 
 # *NOTE* 
 # Need to wait until namespace "openshift" create
@@ -146,9 +135,6 @@ do
   sleep 1
 done
 
-if ! pgrep -P ${DOCKER_PID} > /dev/null ; then
-  echo "Failed to start docker. Please check $DOCKER_LOG" ; exit 1
-fi
 if ! pgrep -P ${ORIGIN_PID} > /dev/null ; then
   echo "Failed to start openshift. Please check $ORIGIN_LOG" ; exit 1
 fi
@@ -212,7 +198,6 @@ echo "
 Step 8 : Setup finished you can use it with
 -----------------------------------
 Logs:
-  ${DOCKER_LOG}
   ${ORIGIN_LOG}
 
 Next steps: Open new terminal and setup it.
